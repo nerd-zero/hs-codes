@@ -1,0 +1,18 @@
+{
+    "name": "nerd-zero/hscodes-php",
+    "description": "PHP library for Harmonized System codes",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "NerdZero\\HscodesPhp\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "nerd-zero"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {}
+}
