@@ -40,20 +40,3 @@ Run tests with Pest:
 ## Requirements
 
 - PHP 8.0+
-
-## License
-
-MIT
-```
-
-Key features:
-- Clear installation instructions
-- Basic usage examples
-- Testing instructions
-- Simple and scannable structure
-
-You can enhance it later with:
-- More detailed examples
-- Contribution guidelines
-- Badges (CI, coverage, etc.)
-- Changelog link
