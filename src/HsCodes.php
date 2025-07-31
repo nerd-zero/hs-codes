@@ -1,21 +1,32 @@
 <?php
 
-namespace HsCodes;
+namespace NerdZero\HsCodes;
+
+use RuntimeException;
 
 class HsCodes
 {
     protected static array $lookup = [];
+    protected static string $dataFile = __DIR__ . '/data/hs_codes.csv';
+
+    public static function setDataFile(string $path): void
+    {
+        if (!file_exists($path)) {
+            throw new \RuntimeException("HS Codes data file not found: $path");
+        }
+        self::$dataFile = $path;
+        self::$lookup = [];
+    }
+
     protected static function loadData(): void
     {
         if (!empty(self::$lookup)) return;
 
-        $file = __DIR__ . '/data/hs_codes.csv';
-
-        if (!file_exists($file) || !is_readable($file)) {
-            throw new \RuntimeException("HS Codes data file not found or not readable: $file");
+        if (!file_exists(self::$dataFile) || !is_readable(self::$dataFile)) {
+            throw new RuntimeException("HS Codes data file not found or not readable: " . self::$dataFile);
         }
 
-        if (($handle = fopen($file, "r")) !== false) {
+        if (($handle = fopen(self::$dataFile, "r")) !== false) {
             fgetcsv($handle);
 
             while (($row = fgetcsv($handle)) !== false) {
@@ -32,46 +43,24 @@ class HsCodes
         }
     }
 
-    /**
-     * Get all HS codes and their descriptions.
-     *
-     * @return array An associative array of HS codes and their descriptions.
-     */
     public static function getCodes(): array
     {
         self::loadData();
         return self::$lookup;
     }
 
-    /**
-     * Get the description for a specific HS code.
-     *
-     * @param string $code The HS code to look up.
-     * @return string|null The description of the HS code, or null if not found.
-     */
     public static function getDescription(string $code): ?string
     {
-       self::loadData();
-        $code = trim($code);
-        return self::$lookup[$code] ?? null;
+        self::loadData();
+        return self::$lookup[trim($code)] ?? null;
     }
 
-    /**
-     * Get all HS code descriptions.
-     *
-     * @return array An array of HS code descriptions.
-     */
     public static function getDescriptions(): array
     {
         self::loadData();
         return array_values(self::$lookup);
     }
 
-    /**
-     * Get the lookup array of HS codes.
-     *
-     * @return array An associative array of HS codes and their descriptions.
-     */
     public static function getLookup(): array
     {
         self::loadData();
