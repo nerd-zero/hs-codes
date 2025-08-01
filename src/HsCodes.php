@@ -6,64 +6,76 @@ use RuntimeException;
 
 class HsCodes
 {
-    protected static array $lookup = [];
-    protected static string $dataFile = __DIR__ . '/data/hs_codes.csv';
+    protected array $lookup = [];
+    protected string $dataFile;
 
-    public static function setDataFile(string $path): void
+    public function __construct(string $dataFile = null)
     {
-        if (!file_exists($path)) {
-            throw new \RuntimeException("HS Codes data file not found: $path");
+        $this->dataFile = $dataFile ?? __DIR__ . '/data/hs_codes.csv';
+
+        if (!file_exists($this->dataFile)) {
+            throw new RuntimeException("HS Codes data file not found: {$this->dataFile}");
         }
-        self::$dataFile = $path;
-        self::$lookup = [];
     }
 
-    protected static function loadData(): void
+    protected function loadData(): void
     {
-        if (!empty(self::$lookup)) return;
-
-        if (!file_exists(self::$dataFile) || !is_readable(self::$dataFile)) {
-            throw new RuntimeException("HS Codes data file not found or not readable: " . self::$dataFile);
+        if (!empty($this->lookup)) {
+            return;
         }
 
-        if (($handle = fopen(self::$dataFile, "r")) !== false) {
-            fgetcsv($handle);
+        if (!is_readable($this->dataFile)) {
+            throw new RuntimeException("HS Codes data file not readable: {$this->dataFile}");
+        }
 
-            while (($row = fgetcsv($handle)) !== false) {
-                if (count($row) >= 2) {
-                    $code = trim($row[1]);
-                    $description = trim($row[2] ?? '');
+        if (($handle = fopen($this->dataFile, "r")) !== false) {
+            try {
+                // Skip header row
+                fgetcsv($handle);
 
-                    if (!empty($code) && !empty($description)) {
-                        self::$lookup[$code] = $description;
+                while (($row = fgetcsv($handle)) !== false) {
+                    if (count($row) >= 3) {
+                        $code = trim($row[1]);
+                        $description = trim($row[2]);
+
+                        if (!empty($code) && !empty($description)) {
+                            $this->lookup[$code] = new HsCodeItem($code, $description);
+                        }
                     }
                 }
+            } finally {
+                fclose($handle);
             }
-            fclose($handle);
         }
     }
 
-    public static function getCodes(): array
+    public function getCodes(): array
     {
-        self::loadData();
-        return self::$lookup;
+        $this->loadData();
+        return array_keys($this->lookup);
     }
 
-    public static function getDescription(string $code): ?string
+    public function getDescription(string $code): ?string
     {
-        self::loadData();
-        return self::$lookup[trim($code)] ?? null;
+        $this->loadData();
+        $code = trim($code);
+
+        if ($this->lookup[$code]) {
+            return $this->lookup[$code]->description;
+        }
+
+        return null;
     }
 
-    public static function getDescriptions(): array
+    public function getDescriptions(): array
     {
-        self::loadData();
-        return array_values(self::$lookup);
+        $this->loadData();
+        return array_map(fn($item) => $item->description, $this->lookup);
     }
 
-    public static function getLookup(): array
+    public function getLookup(): array
     {
-        self::loadData();
-        return self::$lookup;
+        $this->loadData();
+        return $this->lookup;
     }
 }
