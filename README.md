@@ -69,8 +69,8 @@ echo $item->description;
 The library expects a CSV file with the following format:
 ```
 ITEM,HS CODE,GOODS DESCRIPTION
-1,0101,Good Description 1
-2,0102,Good Description 2
+1,0101,Goods Description 1
+2,0102,Goods Description 2
 ```
 
 ## Testing
