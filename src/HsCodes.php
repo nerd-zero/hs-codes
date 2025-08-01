@@ -9,7 +9,7 @@ class HsCodes
     protected array $lookup = [];
     protected string $dataFile;
 
-    public function __construct(string $dataFile = null)
+    public function __construct(?string $dataFile = null)
     {
         $this->dataFile = $dataFile ?? __DIR__ . '/data/hs_codes.csv';
 
